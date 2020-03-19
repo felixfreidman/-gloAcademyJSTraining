@@ -12,7 +12,7 @@ const citiesApi ='http://api.travelpayouts.com/data/ru/cities.json',
     proxy ='https://cors-anywhere.herokuapp.com/',
     API_KEY = '866693554fd1ab7d73b276d46105eba8',
     calendar = 'http://min-prices.aviasales.ru/calendar_preload',
-    queryBilets = '?origin=SVX&destination=KGD&depart_date=2020-05-25&one_way=false';
+    queryTickets = '?origin=SVX&destination=KGD&depart_date=2020-05-25&one_way=false';
 
 
 let city = [];
