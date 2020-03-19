@@ -8,11 +8,11 @@ const formSearch = document.querySelector('.form-search'),
 
 // данные
 
-const citiesApi ='http://api.travelpayouts.com/data/ru/cities.json',
-    proxy ='https://cors-anywhere.herokuapp.com/',
+const citiesApi = 'http://api.travelpayouts.com/data/ru/cities.json',
+    proxy = 'https://cors-anywhere.herokuapp.com/',
     API_KEY = '866693554fd1ab7d73b276d46105eba8',
     calendar = 'http://min-prices.aviasales.ru/calendar_preload',
-    queryTickets = '?origin=SVX&destination=KGD&depart_date=2020-05-25&one_way=false';
+    queryTickets = '?origin=SVX&destination=KGD&depart_date=2020-05-25&one_way=true';
 
 
 let city = [];
@@ -25,9 +25,9 @@ const getData = (url, callback) => {
     request.open('GET', url);
 
     request.addEventListener('readystatechange', () => {
-        if ( request.readyState !== 4 ) return;
+        if (request.readyState !== 4) return;
 
-        if ( request.status === 200 ) {
+        if (request.status === 200) {
             callback(request.response);
         } else {
             console.error(request.status);
@@ -41,8 +41,8 @@ const getData = (url, callback) => {
 const showCity = (input, list) => {
     list.textContent = ''; // очищаем выпадающее меню
 
-    if(input.value !== ''){
-        const  filterCity = city.filter((item) => {
+    if (input.value !== '') {
+        const filterCity = city.filter((item) => {
             const fixItem = item.name.toLowerCase();
             return fixItem.includes(input.value.toLowerCase());
         });
@@ -59,7 +59,7 @@ const showCity = (input, list) => {
 // помещаем в переменную функцию выбора города в выпадающем списке
 const targetPush = (event, input, list) => {
     const target = event.target;
-    if(target.tagName.toLowerCase() === 'li'){
+    if (target.tagName.toLowerCase() === 'li') {
         input.value = target.textContent;
         list.textContent = '';
     }
@@ -68,21 +68,25 @@ const targetPush = (event, input, list) => {
 // обработчики событий
 // при наборе чего либо в инпуте города вылета вызываем функцию, помогающую выбрать город вылета
 inputCitiesFrom.addEventListener('input', () => {
-    showCity(inputCitiesFrom, dropDownCitiesFrom)
+    showCity(inputCitiesFrom, dropDownCitiesFrom);
 });
 // при наборе чего либо в инпуте города прилета вызываем функцию, помогающую выбрать город прилета
 inputCitiesTo.addEventListener('input', () => {
-    showCity(inputCitiesTo, dropDownCitiesTo)
+    showCity(inputCitiesTo, dropDownCitiesTo);
 });
 
 // вешаем событие выбора нужного города вылета при клике на элемент выпадающего списка
 dropDownCitiesFrom.addEventListener('click', (event) => {
-    targetPush(event, inputCitiesFrom, dropDownCitiesFrom)
+    targetPush(event, inputCitiesFrom, dropDownCitiesFrom);
 });
 
 // вешаем событие выбора нужного города прилета при клике на элемент выпадающего списка
 dropDownCitiesTo.addEventListener('click', (event) => {
-    targetPush(event, inputCitiesTo, dropDownCitiesTo)
+    targetPush(event, inputCitiesTo, dropDownCitiesTo);
+});
+
+formSearch.addEventListener('submit', (event) => {
+    event.preventDefault();
 });
 
 
@@ -91,11 +95,12 @@ getData(proxy + citiesApi, (data) => {
     city = JSON.parse(data).filter(item => item.name);
 });
 
+getData();
 // вызов функции которая ищет билеты на 25 мая Екатеринбург - Калининград
-getData(calendar + queryTickets, (data) => {
-    let tickets = [];
-    tickets = JSON.parse(data);
-    console.log(tickets);
-    console.log(tickets.current_depart_date_prices);
-    console.log(tickets.best_prices);
-});
+// getData([proxy + calendar + queryTickets + API_KEY, (data) => {
+//     let tickets = [];
+//     tickets = JSON.parse(data);
+//     console.log(tickets);
+//     console.log(tickets.current_depart_date_prices);
+//     console.log(tickets.best_prices);
+// })
