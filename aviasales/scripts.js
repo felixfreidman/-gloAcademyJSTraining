@@ -1,90 +1,101 @@
-//получаем элементы со страницы
+// собираем все необходимые инпуты и списки
 const formSearch = document.querySelector('.form-search'),
-	inputCitiesFrom = formSearch.querySelector('.input__cities-from'),
-	dropdownCitiesFrom = formSearch.querySelector('.dropdown__cities-from'),
-	dropdownCitiesTo = formSearch.querySelector('.dropdown__cities-to'),
-	inputCitiesTo = formSearch.querySelector('.input__cities-to'),
-	inputDateDepart = formSearch.querySelector('.input__date-depart');
+    inputCitiesFrom = document.querySelector('.input__cities-from'),
+    dropDownCitiesFrom = document.querySelector('.dropdown__cities-from'),
+    inputCitiesTo = document.querySelector('.input__cities-to'),
+    dropDownCitiesTo = document.querySelector('.dropdown__cities-to'),
+    inputDateDepart = document.querySelector('.input__date-depart');
 
-//база городов, ключ АПИ и БД по календарю цен
-const CITY_API = 'http://api.travelpayouts.com/data/ru/cities.json',
-	CALENDAR = 'http://min-prices.aviasales.ru/calendar_preload',
-	PROXY = 'https://cors-anywhere.herokuapp.com/',
-	API_KEY = '5d2e3c92f5cbb5b20d19b432ed48fb95';
-/*'dataBase/cities.json' - та же БД городов, что и citiesApi, но локальная. 
-При вызове getData() вместо citiesApi (онлайн БД) убрать конкатенацию прокси со ссылкой*/
+// данные
+
+const citiesApi ='http://api.travelpayouts.com/data/ru/cities.json',
+    proxy ='https://cors-anywhere.herokuapp.com/',
+    API_KEY = '866693554fd1ab7d73b276d46105eba8',
+    calendar = 'http://min-prices.aviasales.ru/calendar_preload',
+    queryBilets = '?origin=SVX&destination=KGD&depart_date=2020-05-25&one_way=false';
+
 
 let city = [];
 
-//функции, 2 секция
+// функции
+
 const getData = (url, callback) => {
-	const request = new XMLHttpRequest();
+    const request = new XMLHttpRequest();
 
-	request.open('GET', url);
+    request.open('GET', url);
 
-	request.addEventListener('readystatechange', () => {
-		if (request.readyState !== 4) return;
+    request.addEventListener('readystatechange', () => {
+        if ( request.readyState !== 4 ) return;
 
-		if (request.status === 200) {
-			callback(request.response);
-		} else {
-			console.error(request.status);
-		}
-	});
+        if ( request.status === 200 ) {
+            callback(request.response);
+        } else {
+            console.error(request.status);
+        }
+    });
 
-	request.send();
-}
-
-const showCity = (input, list) => {
-	list.textContent = '';
-	
-	if (input.value !== '') {
-		const filterCity = city.filter((item) => {
-			const fixItem = item.toLowerCase();
-			return fixItem.includes(input.value.toLowerCase());
-		});
-		
-		filterCity.forEach((item) => {
-			const li = document.createElement('li');
-			li.classList.add('dropdown__city');
-			li.textContent = item;
-			list.append(li);
-		});
-	} else {
-		return;
-	}
+    request.send();
 };
 
-const handlerCity = (event, input, list) => {
-	const target = event.target;
-	if (target.tagName.toLowerCase() === 'li') {
-		input.value = target.textContent;
-		list.textContent = '';
-	}
+
+const showCity = (input, list) => {
+    list.textContent = ''; // очищаем выпадающее меню
+
+    if(input.value !== ''){
+        const  filterCity = city.filter((item) => {
+            const fixItem = item.name.toLowerCase();
+            return fixItem.includes(input.value.toLowerCase());
+        });
+
+        filterCity.forEach((item) => {
+            const li = document.createElement('li');
+            li.classList.add('dropdown__city');
+            li.textContent = item.name;
+            list.append(li);
+        });
+    }
+};
+
+// помещаем в переменную функцию выбора города в выпадающем списке
+const targetPush = (event, input, list) => {
+    const target = event.target;
+    if(target.tagName.toLowerCase() === 'li'){
+        input.value = target.textContent;
+        list.textContent = '';
+    }
 }
 
-//обработчики событий
+// обработчики событий
+// при наборе чего либо в инпуте города вылета вызываем функцию, помогающую выбрать город вылета
 inputCitiesFrom.addEventListener('input', () => {
-	showCity(inputCitiesFrom, dropdownCitiesFrom)
+    showCity(inputCitiesFrom, dropDownCitiesFrom)
 });
-
+// при наборе чего либо в инпуте города прилета вызываем функцию, помогающую выбрать город прилета
 inputCitiesTo.addEventListener('input', () => {
-	showCity(inputCitiesTo, dropdownCitiesTo)
+    showCity(inputCitiesTo, dropDownCitiesTo)
 });
 
-dropdownCitiesFrom.addEventListener('click', () => {
-	handlerCity(event, inputCitiesFrom, dropdownCitiesFrom);
+// вешаем событие выбора нужного города вылета при клике на элемент выпадающего списка
+dropDownCitiesFrom.addEventListener('click', (event) => {
+    targetPush(event, inputCitiesFrom, dropDownCitiesFrom)
 });
 
-dropdownCitiesTo.addEventListener('click', () => {
-	handlerCity(event, inputCitiesTo, dropdownCitiesTo);
+// вешаем событие выбора нужного города прилета при клике на элемент выпадающего списка
+dropDownCitiesTo.addEventListener('click', (event) => {
+    targetPush(event, inputCitiesTo, dropDownCitiesTo)
 });
 
-//вызовы функций
-getData(PROXY + CITY_API, (data) => {
-	city = JSON.parse(data).filter(item => item.name);
+
+// вызовы функций
+getData(proxy + citiesApi, (data) => {
+    city = JSON.parse(data).filter(item => item.name);
 });
 
-//формирование и осуществление запроса на билет ЕКб - Калининград на 25 мая 2020 года
-const currentRequest = CALENDAR + `?origin=SVX&destination=KGD&depart_date=2020-05-25`;
-getData(currentRequest, data => console.log(JSON.parse(data)));
+// вызов функции которая ищет билеты на 25 мая Екатеринбург - Калининград
+getData(calendar + queryTickets, (data) => {
+    let tickets = [];
+    tickets = JSON.parse(data);
+    console.log(tickets);
+    console.log(tickets.current_depart_date_prices);
+    console.log(tickets.best_prices);
+});
