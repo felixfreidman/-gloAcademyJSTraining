@@ -1,6 +1,4 @@
-
-
-$(document).ready(function () {
+$(document).ready(function() {
     const mobileMenuButton = $(".mob-menu-button");
     const mobileMenu = $('.desktop-group');
     const tab = $('.tab');
@@ -9,7 +7,7 @@ $(document).ready(function () {
         $('body').toggleClass('no-scroll');
     });
 
-    tab.on("click", function () {
+    tab.on("click", function() {
         tab.removeClass('active');
         $(this).toggleClass('active');
         let activeTabContent = $(this).attr('data-target');
